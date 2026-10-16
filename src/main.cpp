@@ -1,14 +1,11 @@
 #include <iostream>
-#include "Node.h"
-
+#include "../Models/HospitalSimulator.h"
 using namespace std;
 
 int main() {
-    cout << "=== Hospital ER & Triage Simulator ===" << endl;
-
-    Node<int> testPatient(101, 5);
-    cout << "Test Patient ID: " << testPatient.getItem()
-        << " | Severity Priority: " << testPatient.getPriority() << endl;
+    HospitalSimulator simulator;
+    simulator.inputFile("../../../Input.txt"); // لو هيرجع 3 خطوات لورا عشان يلاقي الملف في المجلد الرئيسي // تأكد إن اسم الملف مطابق
+    simulator.simulate ();
 
     return 0;
 }

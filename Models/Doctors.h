@@ -11,7 +11,6 @@ private:
 public:
 	Doctor(int id, string name, int specialization) : id(id), name(name), specialization(specialization),  isBusy(false) {}
     Doctor() {
-        // كونستركتور افتراضي فارغ
     }
 };
 #endif

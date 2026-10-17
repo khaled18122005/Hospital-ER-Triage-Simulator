@@ -1,11 +1,16 @@
 #include <iostream>
 #include "../Models/HospitalSimulator.h"
+#include"../Models/Hospital system.h"
 using namespace std;
 
 int main() {
     HospitalSimulator simulator;
-    simulator.inputFile("../../../Input.txt"); // لو هيرجع 3 خطوات لورا عشان يلاقي الملف في المجلد الرئيسي // تأكد إن اسم الملف مطابق
+    HospitalSystem hospital;
+    simulator.inputFile("../../../Input.txt"); 
     simulator.simulate ();
+
+    hospital.loadInputFile("../../../Input.txt");
+    hospital.runSimulation();
 
     return 0;
 }

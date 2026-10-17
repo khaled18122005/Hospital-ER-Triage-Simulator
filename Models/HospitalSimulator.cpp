@@ -20,7 +20,6 @@ HospitalSimulator::HospitalSimulator(int totalDoctors, int totalPatients, int cu
     this->totalPatients = totalPatients;
     this->currentTime = currentTime;
 
-    // حجز مساحة ديناميكية في الذاكرة
     doctors = new Doctor[totalDoctors];
     patients = new Patient[totalPatients];
 }

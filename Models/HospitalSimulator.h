@@ -8,13 +8,12 @@ private:
     int totalPatients;
     int currentTime;
 
-    // تعريف المؤشرات هنا عشان الكلاس يشوفها
     Doctor* doctors;
     Patient* patients;
 
 public:
-    HospitalSimulator(); // كونستركتور افتراضي
-    HospitalSimulator(int totalDoctors, int totalPatients, int currentTime); // كونستركتور بالمتغيرات
+    HospitalSimulator(); 
+    HospitalSimulator(int totalDoctors, int totalPatients, int currentTime); 
     void simulate();
     void inputFile(const string& filename);
     ~HospitalSimulator();

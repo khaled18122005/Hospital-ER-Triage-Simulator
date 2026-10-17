@@ -62,12 +62,26 @@ void HospitalSystem::displayEmergencyQueue() {
 }
 
 void HospitalSystem::runSimulation() {
-    cout << "\n--- Starting Dynamic Hospital ER Triage Simulation ---" << endl;
+    // تعريف أكواد الألوان للـ Console
+    const string RESET = "\033[0m";
+    const string RED = "\033[31m";      // للطوارئ والحالات الحرجة (أولوية عالية)
+    const string GREEN = "\033[32m";    // لدكاترة لما يخلصوا ويبقوا متاحين
+    const string YELLOW = "\033[33m";   // للتنبيهات وحالة امتلاء الدكاترة
+    const string CYAN = "\033[36m";     // للوقت الحالي (Clock Sec)
+    const string MAGENTA = "\033[35m";  // لتوزيع وتعيين المرضى
+
+    cout << CYAN << "\n--- Starting Dynamic Hospital ER Triage Simulation ---" << RESET << endl;
     cout << "Total Patients in Queue: " << emergencyQueue.getCount() << endl;
     cout << "Total Doctors: " << totalDoctors << endl;
 
     srand(static_cast<unsigned int>(time(0)));
     currentTime = 0;
+
+    // تعريف وتصفير مصفوفة عداد المرضى لكل دكتور
+    int* doctorPatientCount = new int[totalDoctors];
+    for (int i = 0; i < totalDoctors; i++) {
+        doctorPatientCount[i] = 0;
+    }
 
     while (true) {
         bool anyDoctorBusy = false;
@@ -79,31 +93,36 @@ void HospitalSystem::runSimulation() {
         }
 
         if (emergencyQueue.isEmpty() && !anyDoctorBusy) {
-            break; 
+            break;
         }
 
-        cout << "\n[Real-Time - Clock Sec: " << currentTime << "]" << endl;
+        cout << CYAN << "\n[Real-Time - Clock Sec: " << currentTime << "]" << RESET << endl;
 
+        // تحديث حالة الدكاترة
         for (int i = 0; i < totalDoctors; i++) {
             if (doctors[i].getIsBusy()) {
                 if (currentTime >= doctors[i].getFreeAtTime()) {
                     doctors[i].setBusy(false);
-                    cout << " -> Doctor " << doctors[i].getName() << " has finished treatment and is now AVAILABLE." << endl;
+                    cout << GREEN << " -> Doctor " << doctors[i].getName() << " has finished treatment and is now AVAILABLE." << RESET << endl;
                 }
             }
         }
 
+        // توزيع المرضى
         while (!emergencyQueue.isEmpty()) {
             Doctor* assignedDoctor = nullptr;
+            int doctorIndex = -1;
+
             for (int i = 0; i < totalDoctors; i++) {
                 if (!doctors[i].getIsBusy()) {
                     assignedDoctor = &doctors[i];
+                    doctorIndex = i;
                     break;
                 }
             }
 
             if (assignedDoctor == nullptr) {
-                cout << "   [Status] All doctors are busy! Remaining patients waiting in queue..." << endl;
+                cout << YELLOW << "   [Status] All doctors are busy! Remaining patients waiting in queue..." << RESET << endl;
                 break;
             }
 
@@ -112,20 +131,43 @@ void HospitalSystem::runSimulation() {
             emergencyQueue.dequeue(currentPatient, priority);
             assignedDoctor->setBusy(true);
 
+            doctorPatientCount[doctorIndex]++;
+
             int randomBonus = rand() % 4;
             int treatmentTime = currentPatient.getTreatmentTime() + randomBonus;
             int finishTime = currentTime + treatmentTime;
             assignedDoctor->setFreeAtTime(finishTime);
 
-            cout << "   [Assignment] Patient ID: " << currentPatient.getId()
-                << " (Priority: " << priority << ")"
-                << " assigned to Doctor: " << assignedDoctor->getName()
-                << " (Treatment Time: " << treatmentTime << "s, finishes at sec " << finishTime << ")" << endl;
+            // تمييز الحالات الخطيرة (أولوية 4 أو 5) باللون الأحمر، وباقي الحالات بالماجنتا
+            if (priority >= 4) {
+                cout << RED << "   [CRITICAL ASSIGNMENT] Patient ID: " << currentPatient.getId()
+                    << " (Priority: " << priority << ")"
+                    << " assigned to Doctor: " << assignedDoctor->getName()
+                    << " (Treatment Time: " << treatmentTime << "s, finishes at sec " << finishTime << ")" << RESET << endl;
+            }
+            else {
+                cout << MAGENTA << "   [Assignment] Patient ID: " << currentPatient.getId()
+                    << " (Priority: " << priority << ")"
+                    << " assigned to Doctor: " << assignedDoctor->getName()
+                    << " (Treatment Time: " << treatmentTime << "s, finishes at sec " << finishTime << ")" << RESET << endl;
+            }
         }
 
         this_thread::sleep_for(chrono::seconds(1));
         currentTime++;
     }
 
-    cout << "\n--- All Patients Treated Successfully! Simulation Completed. ---" << endl;
+    cout << "\n=========================================" << endl;
+    cout << GREEN << "--- Simulation Completed Successfully! ---" << RESET << endl;
+    cout << "=========================================" << endl;
+    cout << "Total Simulation Time Elapsed: " << currentTime << " seconds." << endl;
+    cout << "\n--- Doctor Workload Statistics ---" << endl;
+    for (int i = 0; i < totalDoctors; i++) {
+        cout << " * Doctor " << doctors[i].getName()
+            << " (ID: " << doctors[i].getId() << "): "
+            << doctorPatientCount[i] << " patients treated." << endl;
+    }
+    cout << "=========================================" << endl;
+
+    delete[] doctorPatientCount;
 }

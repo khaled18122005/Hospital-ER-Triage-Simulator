@@ -3,4 +3,4 @@ project(Hospital-ER-Triage-Simulator)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(HospitalSimulator src/main.cpp Models/HospitalSimulator.cpp "Models/Hospital system.h" "Models/Hospital system.cpp")
+add_executable(HospitalSimulator src/main.cpp Models/HospitalSimulator.cpp "Models/Hospital system.h" "Models/Hospital system.cpp" "Models/patient.cpp")
